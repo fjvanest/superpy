@@ -1,0 +1,73 @@
+Dit is wederom een nieuwe poging voor de superpy opdracht van Winc.
+Het grootste struikelblok was dit keer shet werkend krijgen van de code met functies vanuit andere bestanden (imports).
+Dit werkt bijvoorbeeld wel goed voor kopen, verkopen en inventory maar niet voor de profit_revenue functie, dit heb ik opgelost door deze naar de main (superpy) te verplaatsen waar deze wel werkt.
+Geen idee hoe dit kan en waardoor, het zelfde geldt voor de json converter.
+Deze twee functies werkte niet aldus de vorige keer verkregen feedback waar ook benoemd werd dat er enkele aspecten ontbreken.
+Zijnde dat de gebruiker de datum aan kan passen in het systeem. 
+Hier heb ik een nieuwe functie voor gemaakt die de datum aan kan passen naar een tekst bestand.
+Deze is niet werkende in create_read.py of superpy.py (main) maar weer wel bij import vanuit bought_sold_inventory.py.
+Ook nieuwe functie show_product werkt alleen vanuit bought_sold_inventory.py en niet vanuit create_read.py.
+Waar dit door komt is een immens raadsel voor mij en lukt mij niet om te achterhalen.
+Hier heb ik veel op gegoogled en geexperimenteerd in de code, maar geen antwoord noch oplossing.
+Hierdoor lijkt het alsof de code erg onsamenhangend is en ik had dit zelf ook liever anders gezien.
+Wellicht dat jullie als docenten met veel meer ervaring een oplossing zien?
+Nieuw toegevoegd aspect is het weergeven van een blok grafiek met behulp van matplotlib.
+Deze geeft de winst, omzet en kosten weer in een grafiek na het uitvoeren van de profit_revenue functie.
+
+Wat ook  mijn verbazing blijft wekken zijn de volgende meldingen: ModuleNotFoundError: No module named 'matplotlib' (nu bijvoorbeeld matplotlib).
+Meerdere keren voorgekomen dat ik deze melding kreeg en code niet meer werkte waar dit voorheen wel het geval nog was...
+Dit was op de zelfde laptop/pc en na schrijven van code elders functioneerde code daarna dus niet meer.
+Als ik vervolgens probeer de module opnieuw te installeren via pip, geeft deze aan dat de module al bestaat (satisfied).
+Na computer herstarten, modules enkele keren te verwijderen en opnieuw te installeren mbv pip.. werkt deze weer.
+Mochten jullie hier advies voor hebben dan verneem ik dat ook graag. 
+
+De superpy code moet gerund worden vanuit de parent folder van superpy. 
+Dit is nodig omdat ik de automatische paden anders niet werkend kreeg en de bestanden die gemaakt worden anders niet in de parent folder terecht komen.
+Bijvoorbeeld python superpy\superpy.py showproduct -id 19
+
+Ondanks dat het in mijn code ook duidelijk belicht staat nog de volgende opmerking.
+Ik werk met id's om producten te kopen/verkopen.
+Dit om het eenvoudig te houden voor de gebruiker maar ook te voorkomen dat er gelijke producten gekocht worden onder verschillende namen, foutieve producten etc..
+Deze id's zijn als volgt: {1:'Sinas',2:'Cola',3:'Casis',4:'Melk',5:'Water',6:'Limonade',7:'Appelsap',8:'Sinasappelsap',9:'Perensap',10:'Bier'}
+ 
+Hoewel het in de code ook staat beschreven, hieronder argparse functies waar de gebruiker gebruik van kan maken:
+#Parser for buying items
+# bought.csv	id,product_name,buy_price,expiration_date
+buy = subparsers.add_parser('buy', help='register bought items, based on product id, productname, buy price and expiration date.')
+buy.add_argument('-id', required=True,
+                choices=[1,2,3,4,5,6,7,8,9,10], 
+                type=int, metavar='', 
+                help='insert bought item id here (# only). Available products are 1:Sinas,2:Cola,3:Casis,4:Melk,5:Water,6:Limonade,7:Appelsap,8:Sinasappelsap,9:Perensap,10:Bier')
+buy.add_argument('-bp', '--buy_price', type=float, metavar='', required=True, help='insert item price here (x.xx')  
+buy.add_argument('-ed', '--expiration_date', type=datetime.date.fromisoformat, metavar='', required=True, help='insert expiration date here (yyyy-mm-dd)')  
+buy.add_argument('-sbd', '--set_bought_date', type=datetime.date.fromisoformat, metavar='', required=False, help='if bought date is not today, insert date here (yyyy-mm-dd)')  
+#fromisoformat() = The date string in ISO format – yyyy-mm-dd
+
+
+#sold.csv	id,sell_price
+sell = subparsers.add_parser('sell', help='register sold item based on product id, bought id and sell price')
+sell.add_argument('-id', required=True,
+                choices=[1,2,3,4,5,6,7,8,9,10], 
+                type=int, metavar='', 
+                help='insert solditem id here (# only). Available products to sell are 1:Sinas,2:Cola,3:Casis,4:Melk,5:Water,6:Limonade,7:Appelsap,8:Sinasappelsap,9:Perensap,10:Bier / unless sold out, see inventory')
+sell.add_argument('-sp', '--sell_price', type=float, metavar='', required=True, help='insert sold item price here (x.xx)')   
+sell.add_argument('-ssd', '--set_sold_date', type=datetime.date.fromisoformat, metavar='', required=False, help='if sell date is not today, insert date here (yyyy-mm-dd)')  
+
+inventory = subparsers.add_parser('inventory', help='see inventory with items in stock')
+#inventory.add_argument('--inventory', metavar='', required=True, help='see inventory') 
+
+csvjson = subparsers.add_parser("csvjson", help="csvjson convert, insert file name to convert (don't include .csv extension)")
+csvjson.add_argument('-csvjson', '--csvjson', metavar='', required=True, type=str, help='csvjson insert file name to convert (bought, sold, inventory, expired (without extension)')
+
+profitrevenue = subparsers.add_parser('profitrevenue', help='see profit and revenue, can be specified for certain time frame')
+profitrevenue.add_argument('-start', '--set_start_date', type=datetime.date.fromisoformat, metavar='', required=False, help='Set start date, default is first sold item(yyyy-mm-dd)')  
+profitrevenue.add_argument('-stop', '--set_stop_date', type=datetime.date.fromisoformat, metavar='', required=False, help='Set stop date, default is last sold item(yyyy-mm-dd)')  
+
+set_date = subparsers.add_parser('set_date', help='set standard date for this program (yyyy-mm-dd).')
+set_date.add_argument('-sd', '--set_date', type=datetime.date.fromisoformat, metavar='', required=True, help='insert date here (yyyy-mm-dd)')  
+
+showproductps = subparsers.add_parser('showproduct', help='register sold item based on product id, bought id and sell price')
+showproductps.add_argument('-id', required=True,
+                choices=[1,2,3,4,5,6,7,8,9,10], 
+                type=int, metavar='', 
+                help='insert item id here (# only) to see picture of said product. Available products to sell are 1:Sinas,2:Cola,3:Casis,4:Melk,5:Water,6:Limonade,7:Appelsap,8:Sinasappelsap,9:Perensap,10:Bier')
